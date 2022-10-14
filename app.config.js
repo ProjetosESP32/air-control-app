@@ -29,8 +29,18 @@ export default {
     web: {
       favicon: './assets/favicon.png',
     },
+    plugins: [
+      [
+        'expo-image-picker',
+        {
+          photosPermission: 'O app acessa suas fotos para a foto do usuário',
+          cameraPermission: 'O app acessa sua camera para a foto do usuário',
+        },
+      ],
+    ],
     extra: {
       API_URL: process.env.API_URL,
+      BASE_URL: process.env.BASE_URL,
     },
   },
 }

@@ -38,7 +38,7 @@ export const Login: FC = () => {
 
   return (
     <VStack safeArea flex={1} space={2} p={6} justifyContent='center' bg='light.200'>
-      <Heading textAlign='center' color='primary.300'>
+      <Heading textAlign='center'>
         Login
       </Heading>
       <Input

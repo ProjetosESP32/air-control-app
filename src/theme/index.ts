@@ -72,6 +72,11 @@ export const theme = extendTheme({
         variant: 'rounded',
       },
     },
+    Heading: {
+      baseStyle: {
+        color: 'primary.300',
+      },
+    },
   },
 })
 
