@@ -47,19 +47,18 @@ api.interceptors.request.use(async config => {
   return config
 })
 
+const isApplicationJSON = (header: string) => header.includes('application/json')
+
 api.interceptors.response.use(response => {
   const contentTypeHeader =
     typeof response.headers.getContentType === 'function'
       ? response.headers.getContentType()
       : response.headers.getContentType
   const contentTypeString = String(contentTypeHeader)
-  console.log(contentTypeString)
 
   if (!isApplicationJSON(contentTypeString)) {
-    throw new Error('Invalid Content-Type')
+    throw new Error('Invalid Server Content-Type')
   }
 
   return response
 })
-
-const isApplicationJSON = (header: string) => header.includes('application/json')

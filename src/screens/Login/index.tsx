@@ -37,7 +37,7 @@ export const Login: FC = () => {
   const submitHandler = handleSubmit(onSubmit, onError)
 
   return (
-    <VStack safeArea flex={1} space={2} p={6} justifyContent='center' bg='light.200'>
+    <VStack safeArea flex={1} space={2} p={6} justifyContent='center' >
       <Heading textAlign='center'>
         Login
       </Heading>

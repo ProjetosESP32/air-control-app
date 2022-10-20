@@ -15,9 +15,9 @@ interface TabBarIconProps {
   focused: boolean
 }
 
-type IconKey<I> = I extends IconType<infer K, string> ? K : never
+type IconKeys<I> = I extends IconType<infer K, string> ? K : never
 
-function makeTabBarIconComponent<K extends IconKey<typeof Feather>>(iconName: K) {
+function makeTabBarIconComponent<K extends IconKeys<typeof Feather>>(iconName: K) {
   const TabBarIcon: FC<TabBarIconProps> = ({ size, focused }) => (
     <Icon as={Feather} name={iconName} size={size} color={focused ? 'secondary.300' : 'primary.300'} />
   )
@@ -26,7 +26,12 @@ function makeTabBarIconComponent<K extends IconKey<typeof Feather>>(iconName: K)
 }
 
 export const MainTabRoutes: FC = () => (
-  <MainTab.Navigator screenOptions={{ headerShown: false, lazy: true }}>
+  <MainTab.Navigator
+    screenOptions={{
+      headerShown: false,
+      lazy: true,
+    }}
+  >
     <MainTab.Screen name='Home' component={Home} options={{ tabBarIcon: makeTabBarIconComponent('home') }} />
     <MainTab.Screen
       name='UserRooms'

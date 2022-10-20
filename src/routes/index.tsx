@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { hideAsync } from 'expo-splash-screen'
 import React, { FC, useEffect } from 'react'
 import { useUser } from '../hooks/useUser'
+import { navigationTheme } from '../theme'
 import { AppRoutes } from './app.routes'
 import { AuthRoutes } from './auth.routes'
 
@@ -17,5 +18,7 @@ export const Routes: FC = () => {
 
   if (isLoading) return null
 
-  return <NavigationContainer>{isLoggedIn ? <AppRoutes /> : <AuthRoutes />}</NavigationContainer>
+  return (
+    <NavigationContainer theme={navigationTheme}>{isLoggedIn ? <AppRoutes /> : <AuthRoutes />}</NavigationContainer>
+  )
 }

@@ -1,4 +1,5 @@
 import { extendTheme } from 'native-base'
+import { Theme } from '@react-navigation/native'
 import { generateColorScale } from '../utils/color'
 
 export const theme = extendTheme({
@@ -79,6 +80,18 @@ export const theme = extendTheme({
     },
   },
 })
+
+export const navigationTheme: Theme = {
+  dark: false,
+  colors: {
+    primary: theme.colors.primary[400],
+    background: theme.colors.light[200],
+    border: theme.colors.primary[700],
+    card: theme.colors.light[100],
+    text: theme.colors.primary[400],
+    notification: theme.colors.primary[400],
+  },
+}
 
 type CustomTheme = typeof theme
 

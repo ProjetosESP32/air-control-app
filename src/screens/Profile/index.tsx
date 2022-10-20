@@ -4,6 +4,7 @@ import React, { FC, useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
+import { useLogout } from '../../hooks/useLogout'
 import { useUpdateUser } from '../../hooks/useUpdateUser'
 import { useUser } from '../../hooks/useUser'
 import { AvatarProfile } from './Avatar'
@@ -16,8 +17,8 @@ interface ProfileFormData extends FieldValues {
 
 export const Profile: FC = () => {
   const { data: user } = useUser()
-  console.log(user)
-  const { mutateAsync, isLoading } = useUpdateUser()
+  const { mutate, isLoading: isInLoggof } = useLogout()
+  const { mutateAsync, isLoading: isUpdating } = useUpdateUser()
   const [imageUri, setImageUri] = useState<string | null>(null)
   const { handleSubmit, control } = useForm<ProfileFormData>({
     criteriaMode: 'all',
@@ -28,6 +29,7 @@ export const Profile: FC = () => {
       email: user!.email,
     },
   })
+  const isLoading = isInLoggof || isUpdating
 
   const onSubmit = async (data: ProfileFormData) => {
     Keyboard.dismiss()
@@ -63,7 +65,7 @@ export const Profile: FC = () => {
   const submitHandler = handleSubmit(onSubmit, onError)
 
   return (
-    <Box safeArea flex={1} bg='light.200'>
+    <Box safeArea flex={1} >
       <VStack flex={1} space={3} m={4} p={4} rounded='lg' shadow={1} bg='light.100' alignItems='center'>
         <Heading textAlign='center'>Perfil</Heading>
         <AvatarProfile imageUri={imageUri} onChange={setImageUri} />
@@ -89,8 +91,11 @@ export const Profile: FC = () => {
           control={control}
           formControlProps={{ isRequired: true }}
         />
-        <Button onPress={submitHandler} w='100%' disabled={isLoading}>
+        <Button onPress={submitHandler} w='full' disabled={isLoading}>
           Salvar
+        </Button>
+        <Button onPress={() => mutate()} w='full' bg='danger.600' disabled={isLoading}>
+          Sair
         </Button>
       </VStack>
     </Box>
