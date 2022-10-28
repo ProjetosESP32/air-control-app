@@ -1,7 +1,8 @@
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { API_URL } from './env'
+import { API_URL } from '../constants/env'
 import { TOKEN_KEY } from '../constants/storage'
+import { queryClient } from './query-client'
 
 let fullToken: string | null = null
 
@@ -49,16 +50,31 @@ api.interceptors.request.use(async config => {
 
 const isApplicationJSON = (header: string) => header.includes('application/json')
 
-api.interceptors.response.use(response => {
-  const contentTypeHeader =
-    typeof response.headers.getContentType === 'function'
-      ? response.headers.getContentType()
-      : response.headers.getContentType
-  const contentTypeString = String(contentTypeHeader)
+api.interceptors.response.use(
+  response => {
+    const contentTypeHeader =
+      typeof response.headers.getContentType === 'function'
+        ? response.headers.getContentType()
+        : response.headers.getContentType
+    const contentTypeString = String(contentTypeHeader)
 
-  if (!isApplicationJSON(contentTypeString)) {
-    throw new Error('Invalid Server Content-Type')
-  }
+    if (!isApplicationJSON(contentTypeString)) {
+      throw new Error('Invalid Server Content-Type')
+    }
 
-  return response
-})
+    return response
+  },
+  async err => {
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status === 401) {
+        await clearApiAuthorization()
+
+        if (queryClient.getQueryData(['user'])) {
+          await queryClient.resetQueries()
+        }
+      }
+    }
+
+    throw err
+  },
+)

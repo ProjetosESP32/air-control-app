@@ -1,8 +1,8 @@
 import { useIsRestoring } from '@tanstack/react-query'
-import React, { FC, ReactNode } from 'react'
+import { FC } from 'react'
 
 interface RestoringComponentProps {
-  children: ReactNode
+  children: JSX.Element
 }
 
 export const RestoringComponent: FC<RestoringComponentProps> = ({ children }) => {
@@ -10,5 +10,5 @@ export const RestoringComponent: FC<RestoringComponentProps> = ({ children }) =>
 
   if (isRestoring) return null
 
-  return <>{children}</>
+  return children
 }
