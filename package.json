@@ -1,11 +1,10 @@
 {
   "name": "air-control",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint . --ext=.ts,.tsx,.js,.jsx --fix"
   },
@@ -23,7 +22,7 @@
     "@tanstack/react-query-persist-client": "^4.10.3",
     "axios": "^1.1.2",
     "chroma-js": "^2.4.2",
-    "expo": "~46.0.13",
+    "expo": "~46.0.16",
     "expo-constants": "~13.2.4",
     "expo-font": "~10.2.0",
     "expo-image-manipulator": "~10.4.0",
@@ -38,7 +37,9 @@
     "react-native-safe-area-context": "4.3.1",
     "react-native-screens": "~3.15.0",
     "react-native-svg": "12.3.0",
+    "react-native-tcp-socket": "^6.0.2",
     "react-native-web": "~0.18.7",
+    "react-native-wifi-reborn": "^4.7.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {

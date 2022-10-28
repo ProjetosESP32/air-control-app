@@ -19,15 +19,17 @@ export default {
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
+      entitlements: {
+        'com.apple.developer.networking.wifi-info': true,
+      },
+      bundleIdentifier: 'com.ifmt.aircontrol',
     },
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#FFFFFF',
       },
-    },
-    web: {
-      favicon: './assets/favicon.png',
+      package: 'com.ifmt.aircontrol',
     },
     plugins: [
       [
@@ -35,6 +37,12 @@ export default {
         {
           photosPermission: 'O app acessa suas fotos para a foto do usuário',
           cameraPermission: 'O app acessa sua camera para a foto do usuário',
+        },
+      ],
+      [
+        'react-native-wifi-reborn',
+        {
+          fineLocationPermission: false,
         },
       ],
     ],
