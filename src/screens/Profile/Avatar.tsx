@@ -1,11 +1,11 @@
+import { Feather } from '@expo/vector-icons'
 import { launchCameraAsync, launchImageLibraryAsync, MediaTypeOptions, useCameraPermissions } from 'expo-image-picker'
 import { Avatar, Button, Icon, Menu, useDisclose } from 'native-base'
 import React, { FC } from 'react'
 import { useUser } from '../../hooks/useUser'
 import { compressImage } from '../../utils/image'
-import { Feather } from '@expo/vector-icons'
-import { getFullUrlResource } from '../../utils/url'
 import { getFirstLetters } from '../../utils/string'
+import { getFullUrlResource } from '../../utils/url'
 
 interface AvatarProfileProps {
   imageUri?: string | null

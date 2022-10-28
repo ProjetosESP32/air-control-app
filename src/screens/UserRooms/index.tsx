@@ -26,7 +26,7 @@ export const UserRooms: FC = () => {
   )
 
   return (
-    <Box flex={1} safeArea >
+    <Box flex={1} safeArea>
       <VStack flex={1} space={2} m={4} p={2} rounded='lg' shadow={1} bg='light.100'>
         <Heading>Salas que você tem acesso</Heading>
         <Text>Clique em uma para acessar o controle</Text>

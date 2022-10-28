@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { object, string } from 'yup'
 
 export const profileValidation = object().shape({
   username: string()
