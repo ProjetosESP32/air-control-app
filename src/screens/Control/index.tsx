@@ -143,14 +143,14 @@ export const Control: FC = () => {
         <IconButton
           variant='outline'
           onPress={increaseTemperature}
-          disabled={!powerStatus || isLoading}
+          disabled={!powerStatus || isLoading || !isConnected}
           size='lg'
           icon={<Icon as={Feather} name='plus' color='primary.400' size='3xl' />}
         />
         <IconButton
           variant='outline'
           onPress={decreaseTemperature}
-          disabled={!powerStatus || isLoading}
+          disabled={!powerStatus || isLoading || !isConnected}
           size='lg'
           icon={<Icon as={Feather} name='minus' color='primary.400' size='3xl' />}
         />
@@ -159,10 +159,10 @@ export const Control: FC = () => {
           onPress={changePower}
           size='lg'
           icon={<Icon as={Feather} name='power' color={powerStatus ? 'red.500' : 'primary.400'} size='3xl' />}
-          disabled={isLoading}
+          disabled={isLoading || !isConnected}
         />
         <Button onPress={handleConnection} disabled={isLoading}>
-          {isConnected ? 'Conectar' : 'Desconectar'}
+          {isConnected ? 'Desconectar' : 'Conectar'}
         </Button>
       </VStack>
     </Box>
