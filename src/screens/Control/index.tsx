@@ -6,7 +6,7 @@ import WifiManager from 'react-native-wifi-reborn'
 import { useUser } from '../../hooks/useUser'
 import { StackNavigation, StackProp } from '../../types/AppRoutes'
 import { checkLocationPermission, requestLocationPermission } from '../../utils/permission'
-import { send } from '../../utils/socket'
+import Socket from '../../native/socket'
 
 export interface ControlPageProps {
   roomId: number
@@ -29,7 +29,9 @@ export const Control: FC = () => {
   const sendCommand = async (command: string) => {
     setIsLoading(true)
     try {
-      const receivedData = Number(await send(command))
+      const receivedMessage = await Socket.sendAndReceive('192.168.4.1', 80, command, 'utf-8')
+      const receivedData = Number(receivedMessage)
+      console.log(receivedData)
 
       if (!isNaN(receivedData)) {
         setPowerStatus(!!receivedData)
@@ -76,7 +78,6 @@ export const Control: FC = () => {
 
     if (isConnected) {
       try {
-        await WifiManager.forceWifiUsageWithOptions(false, { noInternet: false })
         await WifiManager.disconnect()
       } catch (err) {
         console.error(err)
