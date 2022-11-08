@@ -49,6 +49,8 @@ export default {
     extra: {
       API_URL: process.env.API_URL,
       BASE_URL: process.env.BASE_URL,
+      SOCKET_HOST: process.env.SOCKET_HOST,
+      SOCKET_PORT: process.env.SOCKET_PORT,
     },
   },
 }

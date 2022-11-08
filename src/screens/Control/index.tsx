@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Box, Button, Heading, HStack, Icon, IconButton, Text, VStack } from 'native-base'
+import { Box, Button, Heading, HStack, Icon, IconButton, Spinner, Text, VStack } from 'native-base'
 import React, { FC, useEffect } from 'react'
 import { useAlertDialog } from '../../hooks/useAlertDialog'
 import { useUser } from '../../hooks/useUser'
@@ -121,6 +121,14 @@ export const Control: FC = () => {
         <Button onPress={handleWiFiConnection} disabled={isLoading}>
           {isWiFiConnected ? 'Desconectar' : 'Conectar'}
         </Button>
+        {isLoading && (
+          <HStack space={2} justifyContent='center' alignItems='center'>
+            <Spinner size='lg' />
+            <Text fontWeight='bold' color='primary.500'>
+              Enviando...
+            </Text>
+          </HStack>
+        )}
       </VStack>
     </Box>
   )
