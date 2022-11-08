@@ -26,6 +26,8 @@ import { NativeBaseProvider } from 'native-base'
 import React, { FC } from 'react'
 import { LogBox } from 'react-native'
 import { RestoringComponent } from './src/components/RestoringComponent'
+import { AlertProvider } from './src/hooks/useAlert'
+import { AlertDialogProvider } from './src/hooks/useAlertDialog'
 import { Routes } from './src/routes'
 import { theme } from './src/theme'
 import { asyncStoragePersister, queryClient } from './src/utils/query-client'
@@ -71,7 +73,11 @@ const App: FC = () => {
           }}
         >
           <RestoringComponent>
-            <Routes />
+            <AlertDialogProvider>
+              <AlertProvider>
+                <Routes />
+              </AlertProvider>
+            </AlertDialogProvider>
           </RestoringComponent>
         </PersistQueryClientProvider>
       </NativeBaseProvider>

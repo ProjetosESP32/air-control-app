@@ -4,6 +4,8 @@ import React, { FC, useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
+import { withKeyboardAvoidingView } from '../../components/withKeyboardAvoidingView'
+import { useAlert } from '../../hooks/useAlert'
 import { useLogout } from '../../hooks/useLogout'
 import { useUpdateUser } from '../../hooks/useUpdateUser'
 import { useUser } from '../../hooks/useUser'
@@ -15,7 +17,7 @@ interface ProfileFormData extends FieldValues {
   email: string
 }
 
-export const Profile: FC = () => {
+const ProfileComponent: FC = () => {
   const { data: user } = useUser()
   const { mutate, isLoading: isInLoggof } = useLogout()
   const { mutateAsync, isLoading: isUpdating } = useUpdateUser()
@@ -29,6 +31,7 @@ export const Profile: FC = () => {
       email: user!.email,
     },
   })
+  const { alert } = useAlert()
   const isLoading = isInLoggof || isUpdating
 
   const onSubmit = async (data: ProfileFormData) => {
@@ -52,14 +55,14 @@ export const Profile: FC = () => {
     try {
       await mutateAsync(formData)
     } catch (err) {
-      console.error(err)
+      alert({ title: 'Ocorreu um erro!', description: 'Tente novamente mais tarde.', status: 'error' })
     } finally {
       setImageUri(null)
     }
   }
 
   const onError = () => {
-    console.log('error')
+    alert({ title: 'Formulário inválido!', description: 'Verifique seu formulário.', status: 'warning' })
   }
 
   const submitHandler = handleSubmit(onSubmit, onError)
@@ -101,3 +104,5 @@ export const Profile: FC = () => {
     </Box>
   )
 }
+
+export const Profile = withKeyboardAvoidingView(ProfileComponent)

@@ -4,6 +4,8 @@ import React, { FC } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
+import { withKeyboardAvoidingView } from '../../components/withKeyboardAvoidingView'
+import { useAlert } from '../../hooks/useAlert'
 import { useLogin } from '../../hooks/useLogin'
 import { loginValidation } from './validation'
 
@@ -12,13 +14,14 @@ interface LoginFormData extends FieldValues {
   password: string
 }
 
-export const Login: FC = () => {
+const LoginComponent: FC = () => {
   const { mutateAsync, isLoading } = useLogin()
   const { handleSubmit, control } = useForm<LoginFormData>({
     criteriaMode: 'all',
     mode: 'onSubmit',
     resolver: yupResolver(loginValidation),
   })
+  const { alert } = useAlert()
 
   const onSubmit = async (data: LoginFormData) => {
     Keyboard.dismiss()
@@ -26,12 +29,12 @@ export const Login: FC = () => {
     try {
       await mutateAsync(data)
     } catch (err) {
-      console.error(err)
+      alert({ title: 'Ocorreu um erro!', description: 'Tente novamente mais tarde.', status: 'error' })
     }
   }
 
   const onError = () => {
-    console.log('error')
+    alert({ title: 'Formulário inválido!', description: 'Verifique seu formulário.', status: 'warning' })
   }
 
   const submitHandler = handleSubmit(onSubmit, onError)
@@ -68,3 +71,5 @@ export const Login: FC = () => {
     </VStack>
   )
 }
+
+export const Login = withKeyboardAvoidingView(LoginComponent)

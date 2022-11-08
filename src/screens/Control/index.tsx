@@ -1,107 +1,63 @@
 import { Feather } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Box, Button, Heading, HStack, Icon, IconButton, Text, VStack } from 'native-base'
-import React, { FC, useEffect, useState } from 'react'
-import WifiManager from 'react-native-wifi-reborn'
+import React, { FC, useEffect } from 'react'
+import { useAlertDialog } from '../../hooks/useAlertDialog'
 import { useUser } from '../../hooks/useUser'
 import { StackNavigation, StackProp } from '../../types/AppRoutes'
-import { checkLocationPermission, requestLocationPermission } from '../../utils/permission'
-import Socket from '../../native/socket'
+import { useControl } from './useControl'
 
 export interface ControlPageProps {
   roomId: number
 }
 
-const TEMP_MAX = 27
-const TEMP_MIN = 18
-
 export const Control: FC = () => {
   const { roomId } = useRoute<StackProp<'Control'>>().params
   const navigation = useNavigation<StackNavigation<'Control'>>()
   const { data } = useUser()
-  const [temperature, setTemperature] = useState(TEMP_MIN)
-  const [powerStatus, setPowerStatus] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const {
+    isLoading,
+    power,
+    temperature,
+    isWiFiConnected,
+    changePower,
+    increaseTemperature,
+    decreaseTemperature,
+    handleWiFiConnection,
+    disconnectFromWiFi,
+  } = useControl(roomId)
+  const { dialog } = useAlertDialog()
 
   const room = data?.rooms?.find(({ id }) => id === roomId)
-
-  const sendCommand = async (command: string) => {
-    setIsLoading(true)
-    try {
-      const receivedMessage = await Socket.sendAndReceive('192.168.4.1', 80, command, 'utf-8')
-      const receivedData = Number(receivedMessage)
-      console.log(receivedData)
-
-      if (!isNaN(receivedData)) {
-        setPowerStatus(!!receivedData)
-
-        if (receivedData > 1) {
-          setTemperature(receivedData)
-        }
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const increaseTemperature = async () => {
-    const newTemperature = temperature + 1
-
-    if (newTemperature > TEMP_MAX) return
-
-    await sendCommand(newTemperature.toString())
-  }
-
-  const decreaseTemperature = async () => {
-    const newTemperature = temperature - 1
-
-    if (newTemperature < TEMP_MIN) return
-
-    await sendCommand(newTemperature.toString())
-  }
-
-  const changePower = async () => {
-    await sendCommand(powerStatus ? '0' : '1')
-  }
-
-  const handleConnection = async () => {
-    const hasGranted = await checkLocationPermission()
-
-    if (!hasGranted) {
-      const result = await requestLocationPermission()
-
-      if (!result) return
-    }
-
-    if (isConnected) {
-      try {
-        await WifiManager.disconnect()
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setIsConnected(false)
-      }
-      return
-    }
-
-    try {
-      await WifiManager.connectToProtectedSSID('ESP32Server', '12345678', false)
-      await WifiManager.forceWifiUsageWithOptions(true, { noInternet: true })
-      setIsConnected(true)
-    } catch (err) {
-      setIsConnected(false)
-      console.error('Não foi possível conectar', err)
-    }
-  }
 
   useEffect(() => {
     if (!room) {
       navigation.goBack()
     }
   }, [navigation, room])
+
+  useEffect(() => {
+    if (isWiFiConnected) {
+      return navigation.addListener('beforeRemove', async e => {
+        e.preventDefault()
+
+        dialog({
+          title: 'Sair do controle?',
+          description: 'Sair fará com que você desconecte da rede do Ar e terá que reconectar para enviar comandos.',
+          actions: [
+            {
+              title: 'Sair',
+              color: 'danger',
+              doAction: async () => {
+                await disconnectFromWiFi()
+                navigation.dispatch(e.data.action)
+              },
+            },
+          ],
+        })
+      })
+    }
+  }, [dialog, disconnectFromWiFi, isWiFiConnected, navigation])
 
   return (
     <Box flex={1} safeAreaX safeAreaBottom>
@@ -131,7 +87,7 @@ export const Control: FC = () => {
           p={2}
           bg='light.50'
         >
-          {powerStatus ? 'Ligado' : 'Desligado'}
+          {power ? 'Ligado' : 'Desligado'}
         </Text>
         <VStack bg='light.50' shadow={1} rounded='lg' w='full' p={2} space={1}>
           <Text textAlign='center' fontSize='xl' color='primary.400' fontWeight='bold'>
@@ -144,14 +100,14 @@ export const Control: FC = () => {
         <IconButton
           variant='outline'
           onPress={increaseTemperature}
-          disabled={!powerStatus || isLoading || !isConnected}
+          disabled={!power || isLoading || !isWiFiConnected}
           size='lg'
           icon={<Icon as={Feather} name='plus' color='primary.400' size='3xl' />}
         />
         <IconButton
           variant='outline'
           onPress={decreaseTemperature}
-          disabled={!powerStatus || isLoading || !isConnected}
+          disabled={!power || isLoading || !isWiFiConnected}
           size='lg'
           icon={<Icon as={Feather} name='minus' color='primary.400' size='3xl' />}
         />
@@ -159,11 +115,11 @@ export const Control: FC = () => {
           variant='outline'
           onPress={changePower}
           size='lg'
-          icon={<Icon as={Feather} name='power' color={powerStatus ? 'red.500' : 'primary.400'} size='3xl' />}
-          disabled={isLoading || !isConnected}
+          icon={<Icon as={Feather} name='power' color={power ? 'red.500' : 'primary.400'} size='3xl' />}
+          disabled={isLoading || !isWiFiConnected}
         />
-        <Button onPress={handleConnection} disabled={isLoading}>
-          {isConnected ? 'Desconectar' : 'Conectar'}
+        <Button onPress={handleWiFiConnection} disabled={isLoading}>
+          {isWiFiConnected ? 'Desconectar' : 'Conectar'}
         </Button>
       </VStack>
     </Box>

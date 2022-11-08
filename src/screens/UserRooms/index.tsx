@@ -33,7 +33,7 @@ export const UserRooms: FC = () => {
         <FlatList
           data={data?.rooms ?? []}
           renderItem={renderItem}
-          ItemSeparatorComponent={Divider}
+          ItemSeparatorComponent={ItemSeparator}
           flex={1}
           bg='light.50'
           rounded='md'
@@ -44,6 +44,8 @@ export const UserRooms: FC = () => {
     </Box>
   )
 }
+
+const ItemSeparator = () => <Divider />
 
 const styles = StyleSheet.create({
   flatListContentContainer: {

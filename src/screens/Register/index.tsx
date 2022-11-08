@@ -4,6 +4,8 @@ import React, { FC } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
+import { withKeyboardAvoidingView } from '../../components/withKeyboardAvoidingView'
+import { useAlert } from '../../hooks/useAlert'
 import { useRegiser } from '../../hooks/useRegister'
 import { registerValidation } from './validation'
 
@@ -14,13 +16,14 @@ interface RegisterFormData extends FieldValues {
   passwordConfirmation: string
 }
 
-export const Register: FC = () => {
+const RegisterComponent: FC = () => {
   const { mutateAsync, isLoading } = useRegiser()
   const { handleSubmit, control } = useForm<RegisterFormData>({
     criteriaMode: 'all',
     mode: 'onSubmit',
     resolver: yupResolver(registerValidation),
   })
+  const { alert } = useAlert()
 
   const onSubmit = async (data: RegisterFormData) => {
     Keyboard.dismiss()
@@ -28,12 +31,12 @@ export const Register: FC = () => {
     try {
       await mutateAsync(data)
     } catch (err) {
-      console.error(err)
+      alert({ title: 'Ocorreu um erro!', description: 'Tente novamente mais tarde.', status: 'error' })
     }
   }
 
   const onError = () => {
-    console.log('error')
+    alert({ title: 'Formulário inválido!', description: 'Verifique seu formulário.', status: 'warning' })
   }
 
   const submitHandler = handleSubmit(onSubmit, onError)
@@ -91,3 +94,5 @@ export const Register: FC = () => {
     </VStack>
   )
 }
+
+export const Register = withKeyboardAvoidingView(RegisterComponent)
