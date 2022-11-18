@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SocketModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
-    private final ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public SocketModule(ReactApplicationContext context) {
         super(context);
