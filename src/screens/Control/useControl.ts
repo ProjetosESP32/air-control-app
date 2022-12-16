@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { SOCKET_HOST, SOCKET_PORT } from '../../constants/env'
 import { TEMP_MAX, TEMP_MIN } from '../../constants/temperature'
 import { useAlert } from '../../hooks/useAlert'
@@ -42,7 +42,7 @@ export const useControl = (roomId: number) => {
     }
   }
 
-  const disconnectFromWiFi = useCallback(async () => {
+  const disconnectFromWiFi = async () => {
     try {
       await disconnectFromWiFiAsync()
       setIsWiFiConnected(false)
@@ -62,7 +62,7 @@ export const useControl = (roomId: number) => {
 
       alert({ title: 'Erro!', description: 'Não foi possível desconectar da rede do Ar', status: 'warning' })
     }
-  }, [alert])
+  }
 
   const handleWiFiConnection = async () => {
     if (isWiFiConnected) {

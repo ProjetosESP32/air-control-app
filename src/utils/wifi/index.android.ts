@@ -1,6 +1,6 @@
 import { PermissionsAndroid } from 'react-native'
 import WifiManager from 'react-native-wifi-reborn'
-import { WIFI_PASSWORD, WIFI_SSID } from '../../constants/wifi'
+import { WIFI_PASSWORD, WIFI_SSID } from '../../constants/env'
 
 const checkLocationPermission = async () =>
   await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)

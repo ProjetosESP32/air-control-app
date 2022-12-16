@@ -1,81 +1,83 @@
-import { AspectRatio, Box, Heading, ScrollView, useTheme, VStack } from 'native-base'
+import chroma from 'chroma-js'
+import { Box, Heading, ScrollView, VStack, useTheme } from 'native-base'
 import React, { FC } from 'react'
-import { Dimensions } from 'react-native'
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit'
-
-const { width, height } = Dimensions.get('screen')
+import { useWindowDimensions } from 'react-native'
+import { BarChart, LineChart, PieChart } from 'react-native-chart-kit'
+import { useHome } from '../../hooks/useHome'
+import { ColorHues } from '../../utils/color'
+import { getMonthsByNumber } from '../../utils/date'
 
 export const Home: FC = () => {
-
   const { colors } = useTheme()
+  const { width } = useWindowDimensions()
+  const { data } = useHome()
 
-  const barchartdata = { // variavel de dados provisórios - barchart
-    labels: ["Sala 1", "Sala 2", "Sala 3"],
+  const chartBoxSize = width * 0.85
+
+  const getColor = (opacity = 1) => chroma(colors.primary[600]).alpha(opacity).hex()
+
+  const lineChartData = {
+    labels: data?.dailyConsumption.map(({ hour }) => `${hour}H`) ?? [],
     datasets: [
       {
-        data: [26, 25, 28]
-      }
-    ]
-  };
+        data: data?.dailyConsumption.map(({ totalPotency }) => totalPotency) ?? [],
+        strokeWidth: 2,
+        color: getColor,
+      },
+    ],
+  }
 
-  const piechartdata = [
-    {
-      name: "Seoul",
-      population: 21500000,
-      color: colors.primary[300],
-      legendFontColor: colors.primary[400],
-      legendFontSize: 12
-    },
-    {
-      name: "Toronto",
-      population: 2800000,
-      color: colors.primary[400],
-      legendFontColor: colors.primary[300],
-      legendFontSize: 12
-    }
-  ];
+  const barChartData = {
+    labels: data?.monthConsumption.map(({ month }) => getMonthsByNumber(month)) ?? [],
+    datasets: [
+      {
+        data: data?.monthConsumption.map(({ totalPotency }) => totalPotency) ?? [],
+        color: getColor,
+      },
+    ],
+  }
+
+  const pieCharData =
+    data?.consumptionNow.map(({ block, potency }, index) => ({
+      name: `Bloco ${block.toUpperCase()}`,
+      potency,
+      color: colors.primary[(100 * ((index + 1) % 9)) as ColorHues],
+    })) ?? []
 
   return (
     <Box flex={1} safeArea>
       <ScrollView flex={1}>
         <VStack space={2} m={4} p={2} rounded='lg' shadow={1} bg='light.100'>
           <Heading>Gráficos</Heading>
-          <AspectRatio ratio={{ base: 1 }}>
+          {data && data.dailyConsumption.length > 0 ? (
             <LineChart
-              width={width * 0.85}
-              height={height * 0.4}
-              data={{ labels: ['asasd'], datasets: [{ data: [30, 20, 10] }] }}
-              chartConfig={{
-                color: () => colors.primary[400],
-              }}
+              width={chartBoxSize}
+              height={chartBoxSize}
+              data={lineChartData}
               bezier
+              chartConfig={{ color: () => colors.primary[400] }}
             />
-          </AspectRatio>
-          <AspectRatio ratio={{ base: 1 }}>
+          ) : null}
+          {data && data.monthConsumption.length > 0 ? (
             <BarChart
               yAxisSuffix='' // label lado direito dos valores do eixo y
               yAxisLabel='' // label lado esquerdo dos valores do eixo y
-              height={height * 0.4}
-              width={width * 0.85}
+              height={chartBoxSize}
+              width={chartBoxSize}
               chartConfig={{ color: () => colors.primary[400] }}
-              data={barchartdata}
-
+              data={barChartData}
             />
-          </AspectRatio>
-          <AspectRatio ratio={{ base: 1 }}>
-            {/* <PieChart // terminar de implementar este piechart - descobrir pq ta dando erro.
-              data={piechartdata}
-              height={height * 0.4}
-              width={width * 0.85}
-              paddingLeft='10'
-              chartConfig={{
-                color: () => colors.primary[400]
-              }}
-              accessor={"sala"}
-              backgroundColor={"grey"}
-
-            /> */}
-          </AspectRatio>
+          ) : null}
+          {pieCharData.length > 0 ? (
+            <PieChart
+              data={pieCharData}
+              height={chartBoxSize}
+              width={chartBoxSize}
+              paddingLeft='15'
+              accessor='potency'
+              backgroundColor={colors.white}
+            />
+          ) : null}
         </VStack>
       </ScrollView>
     </Box>

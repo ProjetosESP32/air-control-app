@@ -65,7 +65,7 @@ const LoginComponent: FC = () => {
         control={control}
         formControlProps={{ isRequired: true }}
       />
-      <Button disabled={isLoading} onPress={submitHandler}>
+      <Button disabled={isLoading} isLoading={isLoading} onPress={submitHandler}>
         Entrar
       </Button>
     </VStack>

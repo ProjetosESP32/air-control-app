@@ -3,7 +3,7 @@ import { api } from '../utils/api'
 import { Paginate } from '../types/Paginate'
 import { Room } from '../types/Room'
 
-export const useRooms = () =>
+export const useRooms = (enabled = true) =>
   useInfiniteQuery(
     ['rooms'],
     async ({ pageParam, signal }) => {
@@ -13,7 +13,8 @@ export const useRooms = () =>
       return data
     },
     {
-      getPreviousPageParam: ({ meta: { previousPageUrl } }) => previousPageUrl,
-      getNextPageParam: ({ meta: { nextPageUrl } }) => nextPageUrl,
+      getPreviousPageParam: ({ meta: { previousPageUrl } }) => previousPageUrl ?? undefined,
+      getNextPageParam: ({ meta: { nextPageUrl } }) => nextPageUrl ?? undefined,
+      enabled,
     },
   )

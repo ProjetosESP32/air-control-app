@@ -68,7 +68,7 @@ const ProfileComponent: FC = () => {
   const submitHandler = handleSubmit(onSubmit, onError)
 
   return (
-    <Box safeArea flex={1} >
+    <Box safeArea flex={1}>
       <VStack flex={1} space={3} m={4} p={4} rounded='lg' shadow={1} bg='light.100' alignItems='center'>
         <Heading textAlign='center'>Perfil</Heading>
         <AvatarProfile imageUri={imageUri} onChange={setImageUri} />
@@ -94,7 +94,7 @@ const ProfileComponent: FC = () => {
           control={control}
           formControlProps={{ isRequired: true }}
         />
-        <Button onPress={submitHandler} w='full' disabled={isLoading}>
+        <Button onPress={submitHandler} w='full' disabled={isLoading} isLoading={isLoading}>
           Salvar
         </Button>
         <Button onPress={() => mutate()} w='full' bg='danger.600' disabled={isLoading}>

@@ -3,6 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { Box, Button, Heading, HStack, Icon, IconButton, Spinner, Text, VStack } from 'native-base'
 import React, { FC, useEffect } from 'react'
 import { useAlertDialog } from '../../hooks/useAlertDialog'
+import { useRoomControl } from '../../hooks/useRoomControl'
 import { useUser } from '../../hooks/useUser'
 import { StackNavigation, StackProp } from '../../types/AppRoutes'
 import { useControl } from './useControl'
@@ -14,7 +15,8 @@ export interface ControlPageProps {
 export const Control: FC = () => {
   const { roomId } = useRoute<StackProp<'Control'>>().params
   const navigation = useNavigation<StackNavigation<'Control'>>()
-  const { data } = useUser()
+  const { data: user } = useUser()
+  const { data: roomControl } = useRoomControl(roomId)
   const {
     isLoading,
     power,
@@ -28,13 +30,7 @@ export const Control: FC = () => {
   } = useControl(roomId)
   const { dialog } = useAlertDialog()
 
-  const room = data?.rooms?.find(({ id }) => id === roomId)
-
-  useEffect(() => {
-    if (!room) {
-      navigation.goBack()
-    }
-  }, [navigation, room])
+  const room = roomControl?.room ?? user?.rooms?.find(({ id }) => id === roomId)
 
   useEffect(() => {
     if (isWiFiConnected) {
