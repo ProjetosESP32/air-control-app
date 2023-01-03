@@ -29,9 +29,7 @@ public class SocketModule extends ReactContextBaseJavaModule implements Lifecycl
     public void sendAndReceive(@NonNull String host, @NonNull Double port, @NonNull String message,
             @NonNull String charsetName, @NonNull Promise promise) {
         SocketTask task = new SocketTask(host, port.intValue(), message, Charset.forName(charsetName), promise::resolve,
-                e -> {
-                    promise.reject(e.getCause());
-                });
+                promise::reject);
 
         executorService.execute(task);
     }

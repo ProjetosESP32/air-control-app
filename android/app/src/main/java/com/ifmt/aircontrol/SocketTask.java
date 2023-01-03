@@ -10,20 +10,14 @@ public class SocketTask implements Runnable {
     private int port;
     private String messageToSend;
     private Charset charset;
-    private OnTaskResolve resolve;
-    private OnTaskReject reject;
+    private OnTask<String> resolve;
+    private OnTask<Throwable> reject;
 
-    @FunctionalInterface
-    public interface OnTaskResolve {
-        void apply(String data);
+    public interface OnTask<T> {
+        void apply(T data);
     }
 
-    @FunctionalInterface
-    public interface OnTaskReject {
-        void apply(Exception e);
-    }
-
-    public SocketTask(String address, int port, String messageToSend, Charset charset, OnTaskResolve resolve, OnTaskReject reject) {
+    public SocketTask(String address, int port, String messageToSend, Charset charset, OnTask<String> resolve, OnTask<Throwable> reject) {
         this.address = address;
         this.port = port;
         this.messageToSend = messageToSend;
@@ -53,7 +47,7 @@ public class SocketTask implements Runnable {
 
             resolve.apply(new String(buffer, charset));
         } catch (Exception ex) {
-            reject.apply(ex);
+            reject.apply(ex.getCause());
         }
     }
 }
