@@ -25,12 +25,12 @@ import { StatusBar } from 'expo-status-bar'
 import { NativeBaseProvider } from 'native-base'
 import React, { FC } from 'react'
 import { LogBox } from 'react-native'
-import { RestoringComponent } from './src/components/RestoringComponent'
-import { AlertProvider } from './src/hooks/useAlert'
-import { AlertDialogProvider } from './src/hooks/useAlertDialog'
-import { Routes } from './src/routes'
-import { theme } from './src/theme'
-import { asyncStoragePersister, queryClient } from './src/utils/query-client'
+import { RestoringComponent } from './components/RestoringComponent'
+import { AlertProvider } from './hooks/useAlert'
+import { AlertDialogProvider } from './hooks/useAlertDialog'
+import { Routes } from './routes'
+import { theme } from './theme'
+import { asyncStoragePersister, queryClient } from './utils/query-client'
 
 LogBox.ignoreLogs(['Setting a timer'])
 
