@@ -1,5 +1,12 @@
 import { Feather } from '@expo/vector-icons'
-import { launchCameraAsync, launchImageLibraryAsync, MediaTypeOptions, useCameraPermissions } from 'expo-image-picker'
+import {
+  ImagePickerOptions,
+  ImagePickerResult,
+  launchCameraAsync,
+  launchImageLibraryAsync,
+  MediaTypeOptions,
+  useCameraPermissions,
+} from 'expo-image-picker'
 import { Avatar, Button, Icon, Menu, useDisclose } from 'native-base'
 import React, { FC } from 'react'
 import { useUser } from '../../hooks/useUser'
@@ -17,6 +24,13 @@ export const AvatarProfile: FC<AvatarProfileProps> = ({ imageUri, onChange }) =>
   const [cameraPermissionStatus, requestCameraPermission] = useCameraPermissions()
   const disclose = useDisclose(false)
 
+  const processResult = async (result: ImagePickerResult) => {
+    if (result.canceled) return
+
+    const compressResult = await compressImage(result.assets[0].uri)
+    onChange?.(compressResult)
+  }
+
   const handleCamera = async () => {
     if (!cameraPermissionStatus?.granted && cameraPermissionStatus?.canAskAgain) {
       const permissionStatus = await requestCameraPermission()
@@ -26,29 +40,15 @@ export const AvatarProfile: FC<AvatarProfileProps> = ({ imageUri, onChange }) =>
       }
     }
 
-    const result = await launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      mediaTypes: MediaTypeOptions.Images,
-    })
+    const result = await launchCameraAsync(imagePickerConfig)
 
-    if (!result.cancelled) {
-      const compressResult = await compressImage(result.uri)
-      onChange?.(compressResult)
-    }
+    await processResult(result)
   }
 
   const handleMediaLibrary = async () => {
-    const result = await launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      mediaTypes: MediaTypeOptions.Images,
-    })
+    const result = await launchImageLibraryAsync(imagePickerConfig)
 
-    if (!result.cancelled) {
-      const compressResult = await compressImage(result.uri)
-      onChange?.(compressResult)
-    }
+    await processResult(result)
   }
 
   const imageUrl = data!.cover ? getFullUrlResource(data!.cover.url) : undefined
@@ -75,3 +75,9 @@ export const AvatarProfile: FC<AvatarProfileProps> = ({ imageUri, onChange }) =>
     </>
   )
 }
+
+const imagePickerConfig = {
+  allowsEditing: true,
+  aspect: [1, 1],
+  mediaTypes: MediaTypeOptions.Images,
+} satisfies ImagePickerOptions

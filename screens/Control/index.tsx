@@ -1,12 +1,20 @@
 import { Feather } from '@expo/vector-icons'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Box, Button, Heading, HStack, Icon, IconButton, Spinner, Text, VStack } from 'native-base'
+import { useQuery } from '@tanstack/react-query'
+import { Box, Button, HStack, Heading, Icon, IconButton, Spinner, Text, VStack } from 'native-base'
 import React, { FC, useEffect } from 'react'
 import { useAlertDialog } from '../../hooks/useAlertDialog'
-import { useRoomControl } from '../../hooks/useRoomControl'
 import { useUser } from '../../hooks/useUser'
 import { StackNavigation, StackProp } from '../../types/AppRoutes'
+import { Room } from '../../types/Room'
+import { api } from '../../utils/api'
 import { useControl } from './useControl'
+
+interface RoomControlData {
+  hasServices: boolean
+  canEdit: boolean
+  room: Room
+}
 
 export interface ControlPageProps {
   roomId: number
@@ -16,7 +24,10 @@ export const Control: FC = () => {
   const { roomId } = useRoute<StackProp<'Control'>>().params
   const navigation = useNavigation<StackNavigation<'Control'>>()
   const { data: user } = useUser()
-  const { data: roomControl } = useRoomControl(roomId)
+  const { data: roomControl } = useQuery(
+    ['room', 'control', roomId],
+    async ({ signal }) => (await api.get<RoomControlData>(`v1/rooms/control/${roomId}`, { signal })).data,
+  )
   const {
     isLoading,
     power,
@@ -34,7 +45,7 @@ export const Control: FC = () => {
 
   useEffect(() => {
     if (isWiFiConnected) {
-      return navigation.addListener('beforeRemove', async e => {
+      return navigation.addListener('beforeRemove', e => {
         e.preventDefault()
 
         dialog({

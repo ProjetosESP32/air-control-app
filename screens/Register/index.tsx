@@ -1,15 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Heading, VStack } from 'native-base'
 import React, { FC } from 'react'
-import { FieldValues, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
 import { withKeyboardAvoidingView } from '../../components/withKeyboardAvoidingView'
 import { useAlert } from '../../hooks/useAlert'
-import { useRegiser } from '../../hooks/useRegister'
+import { SessionResponse } from '../../types/SessionResponse'
+import { api, setApiAuthorization } from '../../utils/api'
 import { registerValidation } from './validation'
 
-interface RegisterFormData extends FieldValues {
+interface RegisterFormData {
   username: string
   email: string
   password: string
@@ -17,7 +19,20 @@ interface RegisterFormData extends FieldValues {
 }
 
 const RegisterComponent: FC = () => {
-  const { mutateAsync, isLoading } = useRegiser()
+  const queryClient = useQueryClient()
+  const { mutateAsync, isLoading } = useMutation(
+    ['register'],
+    async (registerData: RegisterFormData) => (await api.post<SessionResponse>('v1/auth/register', registerData)).data,
+    {
+      onSuccess: async ({ token: { type, token }, user }) => {
+        queryClient.setQueryData(['user'], user)
+        await setApiAuthorization(type, token)
+      },
+      onSettled: async () => {
+        await queryClient.invalidateQueries(['user'])
+      },
+    },
+  )
   const { handleSubmit, control } = useForm<RegisterFormData>({
     criteriaMode: 'all',
     mode: 'onSubmit',
@@ -42,7 +57,7 @@ const RegisterComponent: FC = () => {
   const submitHandler = handleSubmit(onSubmit, onError)
 
   return (
-    <VStack safeArea flex={1} space={2} p={6} justifyContent='center' >
+    <VStack safeArea flex={1} space={2} p={6} justifyContent='center'>
       <Heading textAlign='center'>Registro</Heading>
       <Input
         label='Nome'

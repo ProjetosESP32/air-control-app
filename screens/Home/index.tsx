@@ -1,14 +1,16 @@
+import { useQuery } from '@tanstack/react-query'
 import { Box, Heading, ScrollView, Text, VStack, useTheme } from 'native-base'
 import React, { FC } from 'react'
 import { useWindowDimensions } from 'react-native'
+import { Circle, Svg } from 'react-native-svg'
 import { VictoryBar, VictoryChart, VictoryLine, VictoryPie } from 'victory-native'
-import { useHome } from '../../hooks/useHome'
-import { Svg, Circle } from 'react-native-svg'
+import { Home as HomeData } from '../../types/Home'
+import { api } from '../../utils/api'
 
 export const Home: FC = () => {
   const { width } = useWindowDimensions()
   const { colors } = useTheme()
-  const { data } = useHome()
+  const { data } = useQuery(['home'], async ({ signal }) => (await api.get<HomeData>('v1/home', { signal })).data)
 
   const chartBoxSize = width * 0.85
 

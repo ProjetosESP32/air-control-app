@@ -4,7 +4,7 @@ import { Keyboard, Platform, TouchableWithoutFeedback } from 'react-native'
 
 export function withKeyboardAvoidingView<P extends JSX.IntrinsicAttributes>(Component: ComponentType<P>) {
   const ComponentWithKeyboardAvoidingView: FC<P> = props => (
-    <KeyboardAvoidingView flex={1} behavior={Platform.select({ ios: 'padding' })}>
+    <KeyboardAvoidingView flex={1} behavior={Platform.select({ ios: 'padding', android: 'height' })}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Box flex={1}>
           <Component {...props} />

@@ -34,10 +34,10 @@ export const BaseInput: FC<BaseInputProps> = ({
   <FormControl {...formControlProps} isInvalid={!!error} isDisabled={isSubmitting}>
     <FormControl.Label {...formControlLabelProps}>{label}</FormControl.Label>
     <NBInput {...props} />
-    {!!error && (
+    {error ? (
       <FormControl.ErrorMessage {...formControlErrorMessageProps} leftIcon={<WarningOutlineIcon />}>
         {error.message}
       </FormControl.ErrorMessage>
-    )}
+    ) : null}
   </FormControl>
 )

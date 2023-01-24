@@ -1,15 +1,34 @@
 import { useNavigation } from '@react-navigation/native'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { Box, Divider, FlatList, Heading, HStack, Spinner, Text, VStack } from 'native-base'
 import React, { FC, useCallback } from 'react'
 import { ListRenderItemInfo, Pressable, StyleSheet } from 'react-native'
-import { useRooms } from '../../hooks/useRooms'
 import { useUser } from '../../hooks/useUser'
+import { Paginate } from '../../types/Paginate'
 import { Room } from '../../types/Room'
 import { BottomTabNavigation } from '../../types/TabRoutes'
+import { api } from '../../utils/api'
 
 export const UserRooms: FC = () => {
   const { data: user } = useUser()
-  const { data: rooms, fetchNextPage, isFetchingNextPage } = useRooms(!!user?.isRoot)
+  const {
+    data: rooms,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    ['rooms'],
+    async ({ pageParam, signal }) => {
+      const pageParamUrl: string = pageParam ? String(pageParam) : ''
+      const { data } = await api.get<Paginate<Room>>(`v1/rooms${pageParamUrl}`, { signal })
+
+      return data
+    },
+    {
+      getPreviousPageParam: ({ meta: { previousPageUrl } }) => previousPageUrl ?? undefined,
+      getNextPageParam: ({ meta: { nextPageUrl } }) => nextPageUrl ?? undefined,
+      enabled: !!user?.isRoot,
+    },
+  )
   const navigation = useNavigation<BottomTabNavigation<'UserRooms'>>()
 
   const roomsToRender: Room[] = (user?.isRoot ? rooms?.pages.flatMap(({ data }) => data) : user?.rooms) ?? []

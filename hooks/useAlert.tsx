@@ -32,7 +32,7 @@ export const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
 
   return (
     <AlertContext.Provider value={{ alert }}>
-      <Alert {...alertData!} isOpen={!!alertData} onClose={() => setAlertData(null)} />
+      {alertData ? <Alert {...alertData} isOpen={!!alertData} onClose={() => setAlertData(null)} /> : null}
       {children}
     </AlertContext.Provider>
   )

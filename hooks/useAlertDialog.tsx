@@ -26,7 +26,7 @@ export const AlertDialogProvider: FC<AlertDialogProviderProps> = ({ children }) 
 
   return (
     <AlertDialogContext.Provider value={{ dialog }}>
-      <AlertDialog {...alertData!} isOpen={!!alertData} onClose={closeDialog} />
+      {alertData ? <AlertDialog {...alertData} isOpen={!!alertData} onClose={closeDialog} /> : null}
       {children}
     </AlertDialogContext.Provider>
   )

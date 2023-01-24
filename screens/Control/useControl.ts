@@ -1,17 +1,29 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { SOCKET_HOST, SOCKET_PORT } from '../../constants/env'
 import { TEMP_MAX, TEMP_MIN } from '../../constants/temperature'
 import { useAlert } from '../../hooks/useAlert'
-import { useChangePower } from '../../hooks/useChangePower'
-import { useChangeTemperature } from '../../hooks/useChangeTemperature'
 import { Socket } from '../../native/socket'
+import { api } from '../../utils/api'
 import { connectToWiFiAsync, disconnectFromWiFiAsync } from '../../utils/wifi'
 
 const socket = new Socket(SOCKET_HOST, SOCKET_PORT)
 
 export const useControl = (roomId: number) => {
-  const changePowerMutation = useChangePower(roomId)
-  const changeTemperatureMutation = useChangeTemperature(roomId)
+  const queryClient = useQueryClient()
+  const onSettled = async () => {
+    await queryClient.invalidateQueries(['room', 'control', roomId])
+  }
+  const changePowerMutation = useMutation(
+    ['changePower', roomId],
+    async () => await api.post(`v1/rooms/control/${roomId}/power`),
+    { onSettled },
+  )
+  const changeTemperatureMutation = useMutation(
+    ['changeTemperature', roomId],
+    async (temperature: number) => await api.post(`v1/rooms/control/${roomId}/temperature`, { temperature }),
+    { onSettled },
+  )
   const [power, setPower] = useState(false)
   const [temperature, setTemperature] = useState(TEMP_MIN)
   const [isSocketLoading, setIsSocketLoading] = useState(false)

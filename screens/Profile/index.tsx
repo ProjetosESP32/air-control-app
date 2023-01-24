@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Box, Button, Heading, VStack } from 'native-base'
 import React, { FC, useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
@@ -6,9 +7,9 @@ import { Keyboard } from 'react-native'
 import { Input } from '../../components/Input'
 import { withKeyboardAvoidingView } from '../../components/withKeyboardAvoidingView'
 import { useAlert } from '../../hooks/useAlert'
-import { useLogout } from '../../hooks/useLogout'
-import { useUpdateUser } from '../../hooks/useUpdateUser'
 import { useUser } from '../../hooks/useUser'
+import { User } from '../../types/User'
+import { api, clearApiAuthorization } from '../../utils/api'
 import { AvatarProfile } from './Avatar'
 import { profileValidation } from './validation'
 
@@ -19,8 +20,25 @@ interface ProfileFormData extends FieldValues {
 
 const ProfileComponent: FC = () => {
   const { data: user } = useUser()
-  const { mutate, isLoading: isInLoggof } = useLogout()
-  const { mutateAsync, isLoading: isUpdating } = useUpdateUser()
+  const queryClient = useQueryClient()
+  const { mutate, isLoading: isInLoggof } = useMutation(['logout'], async () => await api.delete('v1/auth/logout'), {
+    onSettled: async () => {
+      await clearApiAuthorization()
+      await queryClient.resetQueries()
+    },
+  })
+  const { mutateAsync, isLoading: isUpdating } = useMutation(
+    ['updateUser'],
+    async (formData: FormData) => (await api.put<User>('v1/users', formData)).data,
+    {
+      onSuccess: user => {
+        queryClient.setQueryData(['user'], user)
+      },
+      onSettled: async () => {
+        await queryClient.invalidateQueries(['user'])
+      },
+    },
+  )
   const [imageUri, setImageUri] = useState<string | null>(null)
   const { handleSubmit, control } = useForm<ProfileFormData>({
     criteriaMode: 'all',
