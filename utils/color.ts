@@ -20,7 +20,7 @@ export const generateColorScale = (baseColor: string): ColorScale => {
   const chromaColor = chroma(baseColor)
 
   const colorLightness = LIGHTNESS.map(l => chromaColor.set('hsl.l', l).hex())
-  const linearScale = chroma.scale(colorLightness).correctLightness().colors(10)
+  const linearScale = chroma.scale(colorLightness).correctLightness(true).colors(10)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/prefer-reduce-type-parameter
   return linearScale.reduce((acc, color, index) => ({ ...acc, [COLOR_HUES[index]]: color }), {} as ColorScale)
