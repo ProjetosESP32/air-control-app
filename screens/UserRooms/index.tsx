@@ -6,8 +6,8 @@ import { ListRenderItemInfo, Pressable, StyleSheet } from 'react-native'
 import { useUser } from '../../hooks/useUser'
 import { Paginate } from '../../types/Paginate'
 import { Room } from '../../types/Room'
-import { BottomTabNavigation } from '../../types/TabRoutes'
 import { api } from '../../utils/api'
+import { BottomTabNavigation } from '../../types/routes'
 
 export const UserRooms: FC = () => {
   const { data: user } = useUser()
