@@ -1,4 +1,4 @@
-import React, { createContext, FC, useCallback, useContext, useState } from 'react'
+import React, { createContext, FC, useCallback, useContext, useReducer } from 'react'
 import { AlertDialog, AlertDialogProps } from '../components/AlertDialog'
 
 type AlertData = Omit<AlertDialogProps, 'isOpen' | 'onClose'>
@@ -13,20 +13,43 @@ interface AlertDialogProviderProps {
   children: JSX.Element
 }
 
+type State = Omit<AlertDialogProps, 'onClose'>
+
+type Action =
+  | {
+      type: 'open'
+      data: Omit<State, 'isOpen'>
+    }
+  | {
+      type: 'close'
+    }
+
+const reducer = (_: State, action: Action): State => {
+  if (action.type === 'close') {
+    return { title: '', isOpen: false, description: '' }
+  }
+
+  if (action.type === 'open') {
+    return { ...action.data, isOpen: true }
+  }
+
+  throw new Error('unknown action')
+}
+
 export const AlertDialogProvider: FC<AlertDialogProviderProps> = ({ children }) => {
-  const [alertData, setAlertData] = useState<AlertData | null>(null)
+  const [state, update] = useReducer(reducer, { title: '', description: '', isOpen: false })
 
   const dialog = useCallback((data: AlertData) => {
-    setAlertData(data)
+    update({ type: 'open', data })
   }, [])
 
   const closeDialog = () => {
-    setAlertData(null)
+    update({ type: 'close' })
   }
 
   return (
     <AlertDialogContext.Provider value={{ dialog }}>
-      {alertData ? <AlertDialog {...alertData} isOpen={!!alertData} onClose={closeDialog} /> : null}
+      <AlertDialog {...state} onClose={closeDialog} />
       {children}
     </AlertDialogContext.Provider>
   )
